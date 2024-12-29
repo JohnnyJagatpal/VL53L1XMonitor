@@ -157,6 +157,18 @@ public:
     void addZone(uint16_t min, uint16_t max, void (*onEnter)(uint16_t) = nullptr, void (*onExit)() = nullptr);
 
     /**
+     * @brief Updates an existing monitoring zone.
+     *
+     * Allows modification of the minimum and maximum distance for an existing zone.
+     * If a parameter is not provided, the existing value remains unchanged.
+     *
+     * @param zone_index The index of the zone to update.
+     * @param min_distance Optional new minimum distance in millimeters.
+     * @param max_distance Optional new maximum distance in millimeters.
+     */
+    void updateZone(size_t zone_index, uint16_t min_distance = 0, uint16_t max_distance = 0);
+
+    /**
      * @brief Checks if an object is present in a specific zone.
      *
      * @param zone_index The index of the zone to check.
@@ -185,6 +197,13 @@ public:
      * @param zone_index The index of the zone to delete.
      */
     void deleteZone(size_t zone_index);
+
+    /**
+     * @brief Gets the current distance measured by the sensor.
+     *
+     * @return The measured distance in millimeters, or 0 if no valid data is available.
+     */
+    uint16_t getDistance();
 
     /**
      * @brief Sets the certainty factor for measurements.

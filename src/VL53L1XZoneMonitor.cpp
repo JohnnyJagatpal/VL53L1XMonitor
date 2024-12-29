@@ -116,12 +116,39 @@ ZoneObserver *VL53L1XZoneMonitor::getZone(size_t zone_index)
     return nullptr;
 }
 
+void VL53L1XZoneMonitor::updateZone(size_t zone_index, uint16_t min_distance, uint16_t max_distance)
+{
+    if (zone_index < zones.size())
+    {
+        if (min_distance != 0)
+        {
+            zones[zone_index].min_distance = min_distance;
+        }
+
+        if (max_distance != 0)
+        {
+            zones[zone_index].max_distance = max_distance;
+        }
+    }
+}
+
+
+
 void VL53L1XZoneMonitor::deleteZone(size_t zone_index)
 {
     if (zone_index < zones.size())
     {
         zones.erase(zones.begin() + zone_index);
     }
+}
+
+uint16_t VL53L1XZoneMonitor::getDistance()
+{
+    if (sensor.dataReady())
+    {
+        return sensor.read(false);
+    }
+    return 0;
 }
 
 void VL53L1XZoneMonitor::setCertaintyFactor(size_t certainty)
