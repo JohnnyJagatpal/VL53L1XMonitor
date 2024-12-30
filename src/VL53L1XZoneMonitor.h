@@ -3,6 +3,7 @@
 
 #include <VL53L1X.h>
 #include <vector>
+#include <functional>
 
 /**
  * @brief Represents a single monitoring zone for the VL53L1X sensor.
@@ -12,14 +13,13 @@
  * and triggers callbacks for entering and exiting events when the configured
  * certainty threshold is met.
  */
-class ZoneObserver
-{
+class ZoneObserver {
 public:
-    uint16_t min_distance;               /**< Minimum distance for the zone in millimeters. */
-    uint16_t max_distance;               /**< Maximum distance for the zone in millimeters. */
-    bool object_present;                 /**< Flag indicating whether an object is currently in the zone. */
-    void (*on_enter)(uint16_t distance); /**< Callback function triggered when an object enters the zone. */
-    void (*on_exit)();                   /**< Callback function triggered when an object exits the zone. */
+    uint16_t min_distance;                          /**< Minimum distance for the zone in millimeters. */
+    uint16_t max_distance;                          /**< Maximum distance for the zone in millimeters. */
+    bool object_present;                            /**< Flag indicating whether an object is currently in the zone. */
+    std::function<void(uint16_t distance)> on_enter; /**< Callback function triggered when an object enters the zone. */
+    std::function<void()> on_exit;                 /**< Callback function triggered when an object exits the zone. */
 
     size_t in_zone_count;  /**< Counter for consecutive in-zone measurements. */
     size_t out_zone_count; /**< Counter for consecutive out-of-zone measurements. */
@@ -32,7 +32,7 @@ public:
      * @param onEnter Callback function to execute when an object enters the zone.
      * @param onExit Callback function to execute when an object exits the zone.
      */
-    ZoneObserver(uint16_t min, uint16_t max, void (*onEnter)(uint16_t) = nullptr, void (*onExit)() = nullptr);
+    ZoneObserver(uint16_t min, uint16_t max, std::function<void(uint16_t)> onEnter = nullptr, std::function<void()> onExit = nullptr);
 
     /**
      * @brief Evaluates the current distance measurement against the zone boundaries.
@@ -61,8 +61,7 @@ public:
  * options for distance mode, timing budget, and timeout. It also implements a
  * certainty factor to ensure stable detection before triggering callbacks.
  */
-class VL53L1XZoneMonitor
-{
+class VL53L1XZoneMonitor {
 private:
     VL53L1X sensor;                  /**< Instance of the VL53L1X sensor. */
     std::vector<ZoneObserver> zones; /**< List of defined zones. */
@@ -154,7 +153,7 @@ public:
      * @param onEnter Callback function to execute when an object enters the zone.
      * @param onExit Callback function to execute when an object exits the zone.
      */
-    void addZone(uint16_t min, uint16_t max, void (*onEnter)(uint16_t) = nullptr, void (*onExit)() = nullptr);
+    void addZone(uint16_t min, uint16_t max, std::function<void(uint16_t)> onEnter = nullptr, std::function<void()> onExit = nullptr);
 
     /**
      * @brief Updates an existing monitoring zone.

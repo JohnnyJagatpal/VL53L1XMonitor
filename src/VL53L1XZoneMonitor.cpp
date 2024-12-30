@@ -4,8 +4,8 @@
 
 #include "VL53L1XZoneMonitor.h"
 
-ZoneObserver::ZoneObserver(uint16_t min, uint16_t max, void (*onEnter)(uint16_t), void (*onExit)())
-    : min_distance(min), max_distance(max), object_present(false), on_enter(onEnter), on_exit(onExit),
+ZoneObserver::ZoneObserver(uint16_t min, uint16_t max, std::function<void(uint16_t)> onEnter, std::function<void()> onExit)
+    : min_distance(min), max_distance(max), object_present(false), on_enter(std::move(onEnter)), on_exit(std::move(onExit)),
       in_zone_count(0), out_zone_count(0) {}
 
 void ZoneObserver::evaluate(uint16_t distance, size_t certainty)
@@ -87,9 +87,9 @@ uint16_t VL53L1XZoneMonitor::getTimeout()
     return sensor.getTimeout();
 }
 
-void VL53L1XZoneMonitor::addZone(uint16_t min, uint16_t max, void (*onEnter)(uint16_t), void (*onExit)())
+void VL53L1XZoneMonitor::addZone(uint16_t min, uint16_t max, std::function<void(uint16_t)> onEnter, std::function<void()> onExit)
 {
-    zones.emplace_back(min, max, onEnter, onExit);
+    zones.emplace_back(min, max, std::move(onEnter), std::move(onExit));
 }
 
 bool VL53L1XZoneMonitor::isObjectInZone(size_t zone_index)
@@ -131,8 +131,6 @@ void VL53L1XZoneMonitor::updateZone(size_t zone_index, uint16_t min_distance, ui
         }
     }
 }
-
-
 
 void VL53L1XZoneMonitor::deleteZone(size_t zone_index)
 {
